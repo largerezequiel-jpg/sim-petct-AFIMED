@@ -612,11 +612,12 @@ def validate_simulation(df: pd.DataFrame, params: dict, verbose: bool = True) ->
         ("Fin traslado",     "PET/CT scan",        "Fin traslado > PET/CT scan"),
         ("PET/CT scan",      "Fin PET/CT",         "PET/CT scan > Fin PET/CT"),
     ]
+    _EPS = 1e-9  # tolerancia flotante: 1 nanosegundo en unidades de minutos
     for _, r in df.iterrows():
         pid = int(r["ID"])
         for col_a, col_b, msg in ORDER_CHECKS:
-            if r[col_a] > r[col_b]:
-                errors.append(f"P{pid:02d}: {msg} ({r[col_a]:.1f} > {r[col_b]:.1f})")
+            if r[col_a] > r[col_b] + _EPS:
+                errors.append(f"P{pid:02d}: {msg} ({r[col_a]:.6f} > {r[col_b]:.6f})")
 
     # ── 3. Concurrencia en inyectorios nunca supera capacidad ─────────────────
     errors += _check_concurrent(
